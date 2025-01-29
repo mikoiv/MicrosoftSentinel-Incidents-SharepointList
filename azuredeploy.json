@@ -1,0 +1,476 @@
+{
+    "$schema":  "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion":  "1.0.0.0",
+    "parameters":  {
+        "PlaybookName":  {
+            "defaultValue":  "LA-SecOpsLab-SharepointList-Incidents-dev",
+            "type":  "string"
+        },
+        "SharepointListUrl":  {
+            "defaultValue":  "https://yourtenant.sharepoint.com/sites/yoursite",
+            "type":  "string"
+        },
+        "SharepointListName":  {
+            "defaultValue":  "Security Incidents",
+            "type":  "string"
+        }
+    },
+    "variables":  {
+        "MicrosoftSentinelConnectionName":  "[concat('MicrosoftSentinel-', parameters('PlaybookName'))]",
+        "SharepointonlineConnectionName":  "[concat('Sharepointonline-', parameters('PlaybookName'))]",
+        "SharepointListUrl":  "[parameters('SharepointListUrl')]",
+        "SharepointListName":  "[parameters('SharepointListName')]"
+    },
+    "resources":  [
+        {
+            "properties":  {
+                "provisioningState":  "Succeeded",
+                "state":  "Enabled",
+                "definition":  {
+                    "$schema":  "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion":  "1.0.0.0",
+                    "parameters":  {
+                        "$connections":  {
+                            "defaultValue":  {
+                            },
+                            "type":  "Object"
+                        }
+                    },
+                    "triggers":  {
+                        "Microsoft_Sentinel_incident":  {
+                            "type":  "ApiConnectionWebhook",
+                            "inputs":  {
+                                "host":  {
+                                    "connection":  {
+                                        "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                                    }
+                                },
+                                "body":  {
+                                    "callback_url":  "@{listCallbackUrl()}"
+                                },
+                                "path":  "/incident-creation"
+                            }
+                        }
+                    },
+                    "actions":  {
+                        "Get_items:_Check_if_incident_exists_in_list":  {
+                            "runAfter":  {
+                                "Initialize_variable_AlertProducts":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "ApiConnection",
+                            "inputs":  {
+                                "host":  {
+                                    "connection":  {
+                                        "name":  "@parameters('$connections')['sharepointonline']['connectionId']"
+                                    }
+                                },
+                                "method":  "get",
+                                "path":  "/datasets/@{encodeURIComponent(encodeURIComponent(variables('SharepointURL')))}/tables/@{encodeURIComponent(encodeURIComponent(variables('ListName')))}/items",
+                                "queries":  {
+                                    "$filter":  "IncidentNumber eq '@{triggerBody()?['object']?['properties']?['incidentNumber']}'"
+                                }
+                            }
+                        },
+                        "Initialize_variable_ListID":  {
+                            "runAfter":  {
+                                "Initialize_variable_ListName":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "InitializeVariable",
+                            "inputs":  {
+                                "variables":  [
+                                    {
+                                        "name":  "ListID",
+                                        "type":  "integer"
+                                    }
+                                ]
+                            }
+                        },
+                        "Select_(step_1_of_making_Get_items_result_a_string_not_array)":  {
+                            "runAfter":  {
+                                "Get_items:_Check_if_incident_exists_in_list":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "Select",
+                            "inputs":  {
+                                "from":  "@body('Get_items:_Check_if_incident_exists_in_list')?['value']",
+                                "select":  {
+                                    "ListID":  "@item()?['ID']"
+                                }
+                            }
+                        },
+                        "Join_(step_2_of_making_Get_items_result_a_string_not_array)":  {
+                            "runAfter":  {
+                                "Select_(step_1_of_making_Get_items_result_a_string_not_array)":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "Join",
+                            "inputs":  {
+                                "from":  "@body('Select_(step_1_of_making_Get_items_result_a_string_not_array)')",
+                                "joinWith":  ","
+                            }
+                        },
+                        "Condition:_True_for_New_incident":  {
+                            "actions":  {
+                                "Create_item":  {
+                                    "type":  "ApiConnection",
+                                    "inputs":  {
+                                        "host":  {
+                                            "connection":  {
+                                                "name":  "@parameters('$connections')['sharepointonline']['connectionId']"
+                                            }
+                                        },
+                                        "method":  "post",
+                                        "body":  {
+                                            "Title":  "@triggerBody()?['object']?['properties']?['title']",
+                                            "CreatedTime":  "@triggerBody()?['object']?['properties']?['createdTimeUtc']",
+                                            "Severity":  "@triggerBody()?['object']?['properties']?['severity']",
+                                            "Status":  "@triggerBody()?['object']?['properties']?['status']",
+                                            "Owner":  "@triggerBody()?['object']?['properties']?['owner']?['userPrincipalName']",
+                                            "UnifiedUrl":  "@concat('\u003ca href=\"https://security.microsoft.com/incident2/', triggerBody()?['object']?['properties']?['providerIncidentId'], '/\" target=\"_blank\"\u003eLink\u003c/a\u003e')",
+                                            "AlertCount":  "@triggerBody()?['object']?['properties']?['additionaldata']?['alertsCount']",
+                                            "IncidentNumber":  "@triggerBody()?['object']?['properties']?['incidentNumber']",
+                                            "ProviderIncidentId":  "@triggerBody()?['object']?['properties']?['providerIncidentId']",
+                                            "SentinelUrl":  "@concat('\u003ca href=\"', triggerBody()?['object']?['properties']?['incidentUrl'], '\" target=\"_blank\"\u003eLink\u003c/a\u003e')",
+                                            "FirstActivityTime":  "@triggerBody()?['object']?['properties']?['firstActivityTimeUtc']",
+                                            "LastActivityTime":  "@triggerBody()?['object']?['properties']?['lastActivityTimeUtc']"
+                                        },
+                                        "path":  "/datasets/@{encodeURIComponent(encodeURIComponent(variables('SharepointURL')))}/tables/@{encodeURIComponent(encodeURIComponent(variables('ListName')))}/items"
+                                    }
+                                },
+                                "Set_variable_ListID_new":  {
+                                    "runAfter":  {
+                                        "Create_item":  [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type":  "SetVariable",
+                                    "inputs":  {
+                                        "name":  "ListID",
+                                        "value":  "@body('Create_item')?['ID']"
+                                    }
+                                },
+                                "Delay":  {
+                                    "runAfter":  {
+                                        "Set_variable_ListID_new":  [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type":  "Wait",
+                                    "inputs":  {
+                                        "interval":  {
+                                            "count":  5,
+                                            "unit":  "Minute"
+                                        }
+                                    }
+                                }
+                            },
+                            "runAfter":  {
+                                "Join_(step_2_of_making_Get_items_result_a_string_not_array)":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "else":  {
+                                "actions":  {
+                                    "Set_variable_ListID":  {
+                                        "type":  "SetVariable",
+                                        "inputs":  {
+                                            "name":  "ListID",
+                                            "value":  "@json(outputs('Join_(step_2_of_making_Get_items_result_a_string_not_array)')?['body'])?['ListID']"
+                                        }
+                                    },
+                                    "Update_item":  {
+                                        "runAfter":  {
+                                            "Set_variable_ListID":  [
+                                                "Succeeded"
+                                            ]
+                                        },
+                                        "type":  "ApiConnection",
+                                        "inputs":  {
+                                            "host":  {
+                                                "connection":  {
+                                                    "name":  "@parameters('$connections')['sharepointonline']['connectionId']"
+                                                }
+                                            },
+                                            "method":  "patch",
+                                            "body":  {
+                                                "Title":  "@triggerBody()?['object']?['properties']?['title']",
+                                                "CreatedTime":  "@triggerBody()?['object']?['properties']?['createdTimeUtc']",
+                                                "Severity":  "@triggerBody()?['object']?['properties']?['severity']",
+                                                "Status":  "@triggerBody()?['object']?['properties']?['status']",
+                                                "Owner":  "@triggerBody()?['object']?['properties']?['owner']?['userPrincipalName']",
+                                                "UnifiedUrl":  "@concat('\u003ca href=\"https://security.microsoft.com/incident2/', triggerBody()?['object']?['properties']?['providerIncidentId'], '/\" target=\"_blank\"\u003eLink\u003c/a\u003e')",
+                                                "AlertCount":  "@triggerBody()?['object']?['properties']?['additionaldata']?['alertsCount']",
+                                                "IncidentNumber":  "@triggerBody()?['object']?['properties']?['incidentNumber']",
+                                                "ProviderIncidentId":  "@triggerBody()?['object']?['properties']?['providerIncidentId']",
+                                                "SentinelUrl":  "@concat('\u003ca href=\"', triggerBody()?['object']?['properties']?['incidentUrl'], '\" target=\"_blank\"\u003eLink\u003c/a\u003e')",
+                                                "FirstActivityTime":  "@triggerBody()?['object']?['properties']?['firstActivityTimeUtc']",
+                                                "LastActivityTime":  "@triggerBody()?['object']?['properties']?['lastActivityTimeUtc']",
+                                                "LastModifiedTime":  "@triggerBody()?['object']?['properties']?['lastModifiedTimeUtc']"
+                                            },
+                                            "path":  "/datasets/@{encodeURIComponent(encodeURIComponent(variables('SharepointURL')))}/tables/@{encodeURIComponent(encodeURIComponent(variables('ListName')))}/items/@{encodeURIComponent(variables('ListID'))}"
+                                        }
+                                    }
+                                }
+                            },
+                            "expression":  {
+                                "and":  [
+                                    {
+                                        "equals":  [
+                                            "@body('Join_(step_2_of_making_Get_items_result_a_string_not_array)')",
+                                            ""
+                                        ]
+                                    }
+                                ]
+                            },
+                            "type":  "If"
+                        },
+                        "Initialize_variable_Alerts":  {
+                            "runAfter":  {
+                                "Initialize_variable_ListID":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "InitializeVariable",
+                            "inputs":  {
+                                "variables":  [
+                                    {
+                                        "name":  "Alerts",
+                                        "type":  "string"
+                                    }
+                                ]
+                            }
+                        },
+                        "For_each_Alert_names":  {
+                            "foreach":  "@triggerBody()?['object']?['properties']?['Alerts']",
+                            "actions":  {
+                                "Append_to_string_variable_Alerts":  {
+                                    "type":  "AppendToStringVariable",
+                                    "inputs":  {
+                                        "name":  "Alerts",
+                                        "value":  "@concat(item()?['properties']?['alertDisplayName'], ' - ', formatDateTime(item()?['properties']?['timeGenerated'], 'yyyy-MM-dd HH:mm:ss'), ' (UTC)', '\u003cbr\u003e')"
+                                    }
+                                }
+                            },
+                            "runAfter":  {
+                                "Condition:_Separate_Sentinel_and_Defender_incidents":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "Foreach"
+                        },
+                        "Update_item:_Add_alert_data":  {
+                            "runAfter":  {
+                                "For_each_Alert_names":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "ApiConnection",
+                            "inputs":  {
+                                "host":  {
+                                    "connection":  {
+                                        "name":  "@parameters('$connections')['sharepointonline']['connectionId']"
+                                    }
+                                },
+                                "method":  "patch",
+                                "body":  {
+                                    "Alerts":  "@variables('Alerts')"
+                                },
+                                "path":  "/datasets/@{encodeURIComponent(encodeURIComponent(variables('SharepointURL')))}/tables/@{encodeURIComponent(encodeURIComponent('f1390b3b-cf7c-4255-9b5f-3d19be0958f9'))}/items/@{encodeURIComponent(variables('ListID'))}"
+                            }
+                        },
+                        "Initialize_variable_AlertProducts":  {
+                            "runAfter":  {
+                                "Initialize_variable_Alerts":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "InitializeVariable",
+                            "inputs":  {
+                                "variables":  [
+                                    {
+                                        "name":  "AlertProducts",
+                                        "type":  "string"
+                                    }
+                                ]
+                            }
+                        },
+                        "Condition:_Separate_Sentinel_and_Defender_incidents":  {
+                            "actions":  {
+                                "Update_item:_Sentinel_product":  {
+                                    "type":  "ApiConnection",
+                                    "inputs":  {
+                                        "host":  {
+                                            "connection":  {
+                                                "name":  "@parameters('$connections')['sharepointonline']['connectionId']"
+                                            }
+                                        },
+                                        "method":  "patch",
+                                        "body":  {
+                                            "ProviderName":  "Sentinel"
+                                        },
+                                        "path":  "/datasets/@{encodeURIComponent(encodeURIComponent(variables('SharepointURL')))}/tables/@{encodeURIComponent(encodeURIComponent('f1390b3b-cf7c-4255-9b5f-3d19be0958f9'))}/items/@{encodeURIComponent(variables('ListID'))}"
+                                    }
+                                }
+                            },
+                            "runAfter":  {
+                                "For_each:_Alert_products":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "else":  {
+                                "actions":  {
+                                    "Update_item:_Defender_product":  {
+                                        "type":  "ApiConnection",
+                                        "inputs":  {
+                                            "host":  {
+                                                "connection":  {
+                                                    "name":  "@parameters('$connections')['sharepointonline']['connectionId']"
+                                                }
+                                            },
+                                            "method":  "patch",
+                                            "body":  {
+                                                "ProviderName":  "Defender"
+                                            },
+                                            "path":  "/datasets/@{encodeURIComponent(encodeURIComponent(variables('SharepointURL')))}/tables/@{encodeURIComponent(encodeURIComponent('f1390b3b-cf7c-4255-9b5f-3d19be0958f9'))}/items/@{encodeURIComponent(variables('ListID'))}"
+                                        }
+                                    }
+                                }
+                            },
+                            "expression":  {
+                                "and":  [
+                                    {
+                                        "contains":  [
+                                            "@variables('AlertProducts')",
+                                            "Sentinel"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "type":  "If"
+                        },
+                        "For_each:_Alert_products":  {
+                            "foreach":  "@triggerBody()?['object']?['properties']?['Alerts']",
+                            "actions":  {
+                                "Append_to_string_variable_AlertProducts":  {
+                                    "type":  "AppendToStringVariable",
+                                    "inputs":  {
+                                        "name":  "AlertProducts",
+                                        "value":  "@items('For_each:_Alert_products')?['properties']?['productName']"
+                                    }
+                                }
+                            },
+                            "runAfter":  {
+                                "Condition:_True_for_New_incident":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "Foreach"
+                        },
+                        "Initialize_variable_SharepointURL":  {
+                            "runAfter":  {
+                            },
+                            "type":  "InitializeVariable",
+                            "inputs":  {
+                                "variables":  [
+                                    {
+                                        "name":  "SharepointURL",
+                                        "type":  "string",
+                                        "value": "[variables('SharepointListUrl')]"
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_variable_ListName":  {
+                            "runAfter":  {
+                                "Initialize_variable_SharepointURL":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "InitializeVariable",
+                            "inputs":  {
+                                "variables":  [
+                                    {
+                                        "name":  "ListName",
+                                        "type":  "string",
+                                        "value":  "[variables('SharepointListName')]"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "outputs":  {
+                    }
+                },
+                "parameters":  {
+                    "$connections":  {
+                        "value":  {
+                            "azuresentinel":  {
+                                "connectionId":  "[resourceId('Microsoft.Web/connections', variables('MicrosoftSentinelConnectionName'))]",
+                                "connectionName":  "[variables('MicrosoftSentinelConnectionName')]",
+                                "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuresentinel')]",
+                                "connectionProperties":  {
+                                    "authentication":  {
+                                        "type":  "ManagedServiceIdentity"
+                                    }
+                                }
+                            },
+                            "sharepointonline":  {
+                                "connectionId":  "[resourceId('Microsoft.Web/connections', variables('SharepointonlineConnectionName'))]",
+                                "connectionName":  "[variables('SharepointonlineConnectionName')]",
+                                "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Sharepointonline')]"
+                            }
+                        }
+                    }
+                }
+            },
+            "name":  "[parameters('PlaybookName')]",
+            "type":  "Microsoft.Logic/workflows",
+            "location":  "[resourceGroup().location]",
+            "identity":  {
+                "type":  "SystemAssigned"
+            },
+            "apiVersion":  "2017-07-01",
+            "dependsOn":  [
+                "[resourceId('Microsoft.Web/connections', variables('MicrosoftSentinelConnectionName'))]",
+                "[resourceId('Microsoft.Web/connections', variables('SharepointonlineConnectionName'))]"
+            ]
+        },
+        {
+            "type":  "Microsoft.Web/connections",
+            "apiVersion":  "2016-06-01",
+            "name":  "[variables('MicrosoftSentinelConnectionName')]",
+            "location":  "[resourceGroup().location]",
+            "kind":  "V1",
+            "properties":  {
+                "displayName":  "[variables('MicrosoftSentinelConnectionName')]",
+                "customParameterValues":  {
+                },
+                "parameterValueType":  "Alternative",
+                "api":  {
+                    "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuresentinel')]"
+                }
+            }
+        },
+        {
+            "type":  "Microsoft.Web/connections",
+            "apiVersion":  "2016-06-01",
+            "name":  "[variables('SharepointonlineConnectionName')]",
+            "location":  "[resourceGroup().location]",
+            "kind":  "V1",
+            "properties":  {
+                "displayName":  "[variables('SharepointonlineConnectionName')]",
+                "customParameterValues":  {
+                },
+                "api":  {
+                    "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Sharepointonline')]"
+                }
+            }
+        }
+    ]
+}
