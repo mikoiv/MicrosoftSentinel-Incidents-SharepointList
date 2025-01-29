@@ -1,9 +1,7 @@
 # MicrosoftSentinel-Incidents-SharepointList
 Feed Sentinel incidents to a Sharepoint List and Teams Channel
 
-Todo
-
-read more on blog
+Read more here: https://secopslab.substack.com
 
 ## Deployment
 
