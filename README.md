@@ -12,10 +12,9 @@ Read more here: https://secopslab.substack.com
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmikoiv%2FMicrosoftSentinel-Incidents-SharepointList%2Fmain%2FSentinel_automation_rules.json)
 
-## Sharepoint list schema
+## Incident list schema
 
 [List_column_template.csv](https://github.com/mikoiv/MicrosoftSentinel-Incidents-SharepointList/blob/main/List_column_template.csv)
-
 
 | Column | Explanation |
 | --- | --- |
