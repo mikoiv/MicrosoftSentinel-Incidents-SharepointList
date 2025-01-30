@@ -18,6 +18,8 @@ Read more here: https://secopslab.substack.com
 
 Columns included: 
 
+| Column | Explanation |
+| --- | --- |
 | CreatedTime | Incicent created time |
 | Title | Incident title |
 | Severity | Incident severity |
