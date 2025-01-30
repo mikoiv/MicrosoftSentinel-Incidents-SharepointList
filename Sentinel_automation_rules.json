@@ -17,7 +17,7 @@
     },
     "resources": [
         {
-            "name": "Incident Sharepoint List: New incidents]",
+            "name": "Incident Sharepoint List: New incidents",
             "type": "Microsoft.SecurityInsights/automationRules",
             "scope": "[concat('Microsoft.OperationalInsights/workspaces/', parameters('Workspace'))]",
             "apiVersion": "2024-03-01",
