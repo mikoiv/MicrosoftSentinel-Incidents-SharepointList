@@ -2,11 +2,11 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "WorkspaceId": {
+        "Workspace": {
             "type": "String",
-            "defaultValue": "Your Sentinel workspace id"
+            "defaultValue": "Your Sentinel workspace name"
         },
-        "TenantId": {
+        "Tenant": {
             "type": "string",
             "defaultValue": "Your Entra tenant id"
         },
@@ -17,10 +17,10 @@
     },
     "resources": [
         {
-            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/AutomationRules/f8cbb9db-52dd-4911-8e38-a25679b357a5')]",
-            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/f8cbb9db-52dd-4911-8e38-a25679b357a5')]",
-            "type": "Microsoft.OperationalInsights/workspaces/providers/AutomationRules",
-            "apiVersion": "2024-04-01-preview",
+            "name": "Incident Sharepoint List: New incidents]",
+            "type": "Microsoft.SecurityInsights/automationRules",
+            "scope": "[concat('Microsoft.OperationalInsights/workspaces/', parameters('Workspace'))]",
+            "apiVersion": "2024-03-01",
             "properties": {
                 "displayName": "Incident Sharepoint List: New incidents",
                 "order": 3,
@@ -35,18 +35,18 @@
                         "order": 1,
                         "actionType": "RunPlaybook",
                         "actionConfiguration": {
-                            "logicAppResourceId": "/subscriptions/d0f4f21b-3cee-4c8e-8514-04f2c3786b4b/resourceGroups/rg-automation-sec-001/providers/Microsoft.Logic/workflows/LA-Sentinel-SharepointList-Incidents-dev",
-                            "tenantId": "4a5d1d90-5ce3-4b97-9b81-028dee0c72dc"
+                            "logicAppResourceId": "[Parameters('LogicAppResourceId')]",
+                            "tenantId": "[Parameters('Tenant')]"
                         }
                     }
                 ]
             }
         },
         {
-            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/AutomationRules/2b888e3b-cc55-4061-abf0-989b725faf86')]",
-            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/2b888e3b-cc55-4061-abf0-989b725faf86')]",
-            "type": "Microsoft.OperationalInsights/workspaces/providers/AutomationRules",
-            "apiVersion": "2024-04-01-preview",
+            "name": "Incident Sharepoint List: Updates",
+            "type": "Microsoft.SecurityInsights/automationRules",
+            "scope": "[concat('Microsoft.OperationalInsights/workspaces/', parameters('Workspace'))]",
+            "apiVersion": "2024-03-01",
             "properties": {
                 "displayName": "Incident Sharepoint List: Updates",
                 "order": 4,
@@ -151,8 +151,8 @@
                         "order": 1,
                         "actionType": "RunPlaybook",
                         "actionConfiguration": {
-                            "logicAppResourceId": "/subscriptions/d0f4f21b-3cee-4c8e-8514-04f2c3786b4b/resourceGroups/rg-automation-sec-001/providers/Microsoft.Logic/workflows/LA-Sentinel-SharepointList-Incidents-dev",
-                            "tenantId": "4a5d1d90-5ce3-4b97-9b81-028dee0c72dc"
+                            "logicAppResourceId": "[Parameters('LogicAppResourceId')]",
+                            "tenantId": "[Parameters('Tenant')]"
                         }
                     }
                 ]
