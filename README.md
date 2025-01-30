@@ -20,7 +20,7 @@ Read more here: https://secopslab.substack.com
 | Column | Explanation |
 | --- | --- |
 | CreatedTime | Incicent created time |
-| Title | Incident title |
+| Title |Incident title |
 | Severity | Incident severity |
 | Status | Incident status |
 | Owner | Current owner, if set |
