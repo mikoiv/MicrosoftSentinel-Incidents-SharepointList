@@ -281,7 +281,7 @@
                                 "body":  {
                                     "Alerts":  "@variables('Alerts')"
                                 },
-                                "path":  "/datasets/@{encodeURIComponent(encodeURIComponent(variables('SharepointURL')))}/tables/@{encodeURIComponent(encodeURIComponent('f1390b3b-cf7c-4255-9b5f-3d19be0958f9'))}/items/@{encodeURIComponent(variables('ListID'))}"
+                                "path":  "/datasets/@{encodeURIComponent(encodeURIComponent(variables('SharepointURL')))}/tables/@{encodeURIComponent(encodeURIComponent(variables('ListName')))}/items/@{encodeURIComponent(variables('ListID'))}"
                             }
                         },
                         "Initialize_variable_AlertProducts":  {
@@ -314,7 +314,7 @@
                                         "body":  {
                                             "ProviderName":  "Sentinel"
                                         },
-                                        "path":  "/datasets/@{encodeURIComponent(encodeURIComponent(variables('SharepointURL')))}/tables/@{encodeURIComponent(encodeURIComponent('f1390b3b-cf7c-4255-9b5f-3d19be0958f9'))}/items/@{encodeURIComponent(variables('ListID'))}"
+                                        "path":  "/datasets/@{encodeURIComponent(encodeURIComponent(variables('SharepointURL')))}/tables/@{encodeURIComponent(encodeURIComponent(variables('ListName')))}/items/@{encodeURIComponent(variables('ListID'))}"
                                     }
                                 }
                             },
@@ -337,7 +337,7 @@
                                             "body":  {
                                                 "ProviderName":  "Defender"
                                             },
-                                            "path":  "/datasets/@{encodeURIComponent(encodeURIComponent(variables('SharepointURL')))}/tables/@{encodeURIComponent(encodeURIComponent('f1390b3b-cf7c-4255-9b5f-3d19be0958f9'))}/items/@{encodeURIComponent(variables('ListID'))}"
+                                            "path":  "/datasets/@{encodeURIComponent(encodeURIComponent(variables('SharepointURL')))}/tables/@{encodeURIComponent(encodeURIComponent(variables('ListName')))}/items/@{encodeURIComponent(variables('ListID'))}"
                                         }
                                     }
                                 }
