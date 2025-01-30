@@ -19,17 +19,17 @@ Read more here: https://secopslab.substack.com
 
 | Column | Explanation |
 | --- | --- |
-| CreatedTime | Incicent created time |
+| CreatedTime |Incident created time |
 | Title |Incident title |
-| Severity | Incident severity |
-| Status | Incident status |
-| Owner | Current owner, if set |
-| ProviderName | Set to either Defender or Sentinel |
-| FirstActivityTime | First activity time |
-| SentinelUrl | Direct link to Sentinel | 
-| UnifiedUrl | Direct link to Unified portal |
-| AlertCount | Count of alerts in the incident | 
-| ProviderIncidentId | XDR incident number | 
-| IncidentNumber | Sentinel incident number | 
-| LastActivityTime | Last activity time |
-| Alerts | List of individual alerts in the incident | 
+| Severity |Incident severity |
+| Status |Incident status |
+| Owner |Current owner, if set |
+| ProviderName |Set to either Defender or Sentinel |
+| FirstActivityTime |First activity time |
+| SentinelUrl |Direct link to Sentinel | 
+| UnifiedUrl |Direct link to Unified portal |
+| AlertCount |Count of alerts in the incident | 
+| ProviderIncidentId |XDR incident number | 
+| IncidentNumber |Sentinel incident number | 
+| LastActivityTime |Last activity time |
+| Alerts |List of individual alerts in the incident | 
