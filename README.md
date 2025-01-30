@@ -16,7 +16,6 @@ Read more here: https://secopslab.substack.com
 
 [List_column_template.csv](https://github.com/mikoiv/MicrosoftSentinel-Incidents-SharepointList/blob/main/List_column_template.csv)
 
-Columns included: 
 
 | Column | Explanation |
 | --- | --- |
