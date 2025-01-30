@@ -7,7 +7,7 @@
             "type":  "string"
         },
         "SharepointListUrl":  {
-            "defaultValue":  "https://yourtenant.sharepoint.com/sites/yoursite",
+            "defaultValue":  "https://yourtenant.sharepoint.com/sites/yoursite/",
             "type":  "string"
         },
         "SharepointListName":  {
