@@ -210,8 +210,7 @@
                                                 "ProviderIncidentId":  "@triggerBody()?['object']?['properties']?['providerIncidentId']",
                                                 "SentinelUrl":  "@concat('\u003ca href=\"', triggerBody()?['object']?['properties']?['incidentUrl'], '\" target=\"_blank\"\u003eLink\u003c/a\u003e')",
                                                 "FirstActivityTime":  "@triggerBody()?['object']?['properties']?['firstActivityTimeUtc']",
-                                                "LastActivityTime":  "@triggerBody()?['object']?['properties']?['lastActivityTimeUtc']",
-                                                "LastModifiedTime":  "@triggerBody()?['object']?['properties']?['lastModifiedTimeUtc']"
+                                                "LastActivityTime":  "@triggerBody()?['object']?['properties']?['lastActivityTimeUtc']"
                                             },
                                             "path":  "/datasets/@{encodeURIComponent(encodeURIComponent(variables('SharepointURL')))}/tables/@{encodeURIComponent(encodeURIComponent(variables('ListName')))}/items/@{encodeURIComponent(variables('ListID'))}"
                                         }
