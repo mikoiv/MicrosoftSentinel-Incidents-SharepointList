@@ -164,7 +164,7 @@
                                     "type":  "Wait",
                                     "inputs":  {
                                         "interval":  {
-                                            "count":  5,
+                                            "count":  2,
                                             "unit":  "Minute"
                                         }
                                     }
