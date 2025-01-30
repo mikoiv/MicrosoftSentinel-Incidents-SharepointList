@@ -15,3 +15,20 @@ Read more here: https://secopslab.substack.com
 ## Sharepoint list schema
 
 [List_column_template.csv](https://github.com/mikoiv/MicrosoftSentinel-Incidents-SharepointList/blob/main/List_column_template.csv)
+
+Columns included: 
+
+| CreatedTime | Incicent created time |
+| Title | Incident title |
+| Severity | Incident severity |
+| Status | Incident status |
+| Owner | Current owner, if set |
+| ProviderName | Set to either Defender or Sentinel |
+| FirstActivityTime | First activity time |
+| SentinelUrl | Direct link to Sentinel | 
+| UnifiedUrl | Direct link to Unified portal |
+| AlertCount | Count of alerts in the incident | 
+| ProviderIncidentId | XDR incident number | 
+| IncidentNumber | Sentinel incident number | 
+| LastActivityTime | Last activity time |
+| Alerts | List of individual alerts in the incident | 
