@@ -2,8 +2,17 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "workspace": {
-            "type": "String"
+        "WorkspaceId": {
+            "type": "String",
+            "defaultValue": "Your Sentinel workspace id"
+        },
+        "TenantId": {
+            "type": "string",
+            "defaultValue": "Your Entra tenant id"
+        },
+        "LogicAppResourceId": {
+            "type": "string",
+            "defaultValue": "Full resource id of your Logic App"
         }
     },
     "resources": [
@@ -26,7 +35,7 @@
                         "order": 1,
                         "actionType": "RunPlaybook",
                         "actionConfiguration": {
-                            "logicAppResourceId": "/subscriptions/d0f4f21b-3cee-4c8e-8514-04f2c3786b4b/resourceGroups/rg-automation-sec-001/providers/Microsoft.Logic/workflows/LA-SharepointList-Incidents-dev",
+                            "logicAppResourceId": "/subscriptions/d0f4f21b-3cee-4c8e-8514-04f2c3786b4b/resourceGroups/rg-automation-sec-001/providers/Microsoft.Logic/workflows/LA-Sentinel-SharepointList-Incidents-dev",
                             "tenantId": "4a5d1d90-5ce3-4b97-9b81-028dee0c72dc"
                         }
                     }
@@ -142,7 +151,7 @@
                         "order": 1,
                         "actionType": "RunPlaybook",
                         "actionConfiguration": {
-                            "logicAppResourceId": "/subscriptions/d0f4f21b-3cee-4c8e-8514-04f2c3786b4b/resourceGroups/rg-automation-sec-001/providers/Microsoft.Logic/workflows/LA-SharepointList-Incidents-dev",
+                            "logicAppResourceId": "/subscriptions/d0f4f21b-3cee-4c8e-8514-04f2c3786b4b/resourceGroups/rg-automation-sec-001/providers/Microsoft.Logic/workflows/LA-Sentinel-SharepointList-Incidents-dev",
                             "tenantId": "4a5d1d90-5ce3-4b97-9b81-028dee0c72dc"
                         }
                     }
